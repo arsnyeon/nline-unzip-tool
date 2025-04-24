@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线解压缩工具</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- 苹果风格图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- JSZip库用于处理ZIP文件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Uncompress.js库支持多种解压格式 -->
+    <script src="https://cdn.jsdelivr.net/npm/uncompress.js@1.1.0/dist/uncompress.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="48" height="48" rx="12" fill="#007AFF" />
+                    <path d="M14 18L24 12L34 18V30L24 36L14 30V18Z" stroke="white" stroke-width="2" />
+                    <path d="M24 12V36" stroke="white" stroke-width="2" />
+                    <path d="M14 18L34 18" stroke="white" stroke-width="2" />
+                    <path d="M14 30L34 30" stroke="white" stroke-width="2" />
+                </svg>
+                <h1>在线解压缩工具</h1>
+            </div>
+        </header>
+
+        <main>
+            <section class="upload-section" id="upload-section">
+                <div class="upload-container" id="drop-area">
+                    <div class="upload-icon">
+                        <i class="fas fa-file-archive"></i>
+                    </div>
+                    <h2>上传压缩文件</h2>
+                    <p>点击或拖拽文件到此处上传<br>(支持ZIP, RAR, 7Z等格式，最大100MB)</p>
+                    <input type="file" id="file-input" accept=".zip,.rar,.7z,.tar,.gz,.bz2" hidden>
+                    <button class="upload-btn" id="upload-btn">选择文件</button>
+                </div>
+            </section>
+
+            <section class="processing-section" id="processing-section">
+                <div class="progress-container">
+                    <h2>正在解压中...</h2>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <p id="progress-text">0%</p>
+                </div>
+            </section>
+
+            <section class="result-section" id="result-section">
+                <div class="result-header">
+                    <h2>解压结果</h2>
+                    <div class="file-info">
+                        <span id="file-name">未选择文件</span>
+                        <span id="file-size"></span>
+                    </div>
+                    <button class="download-all-btn" id="download-all-btn">
+                        <i class="fas fa-download"></i> 下载全部
+                    </button>
+                </div>
+                
+                <div class="file-explorer">
+                    <div class="file-list-header">
+                        <div class="file-name-header">文件名</div>
+                        <div class="file-size-header">大小</div>
+                        <div class="file-action-header">操作</div>
+                    </div>
+                    <div class="file-list" id="file-list">
+                        <!-- 解压后的文件将在这里列出 -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div class="error-popup" id="error-popup">
+            <div class="error-content">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>错误</h3>
+                <p id="error-message"></p>
+                <button id="error-close">确定</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2024 在线解压缩工具 | 所有文件处理均在本地完成，确保您的文件安全</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
