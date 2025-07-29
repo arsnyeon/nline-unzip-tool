@@ -57,6 +57,49 @@ main {
     gap: 30px;
 }
 
+/* 工具栏样式 */
+.toolbar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 4px;
+    margin-bottom: 20px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tool-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    background-color: transparent;
+    color: var(--dark-gray);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.tool-btn:hover {
+    background-color: var(--light-gray);
+}
+
+.tool-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.tool-btn i {
+    font-size: 16px;
+}
+
 /* 上传区域样式 */
 .upload-section {
     background-color: white;
@@ -71,12 +114,14 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
     border: 2px dashed var(--medium-gray);
     border-radius: var(--border-radius);
-    padding: 32px;
+    padding: 40px;
     cursor: pointer;
     transition: all 0.3s ease;
+    min-height: 350px;
+    justify-content: center;
 }
 
 .upload-container:hover, .upload-container.drag-over {
@@ -85,9 +130,13 @@ main {
 }
 
 .upload-icon {
-    font-size: 48px;
+    font-size: 64px;
     color: var(--primary-color);
     margin-bottom: 12px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .upload-container h2 {
@@ -106,21 +155,45 @@ main {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    border-radius: 20px;
-    padding: 10px 20px;
+    border-radius: 8px;
+    padding: 12px 24px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 .upload-btn:hover {
     background-color: #0066CC;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
 }
 
 .upload-btn:active {
     transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.upload-btn.secondary {
+    background-color: var(--medium-gray);
+    color: var(--text-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.upload-btn.secondary:hover {
+    background-color: var(--dark-gray);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.upload-buttons, .compress-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    min-height: 48px;
+    align-items: center;
 }
 
 /* 处理中区域样式 */

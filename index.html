@@ -4,14 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>在线解压缩工具 - yasuo.zip</title>
+	<meta name="description" content="在线压缩包解压工具，支持zip压缩格式，解析压缩包成单独的文件，用户可随机选择下载需要的文件或全部下载，纯前端JS完成，不会上传到服务器，是日常使用、办公辅助的应急好帮手。" />
+    <meta name="keywords" content="在线压缩包解压工具，支持ZIP、GZ、TAR压缩格式" />
     <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
     <!-- 苹果风格图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- JSZip库用于处理ZIP文件 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <!-- Uncompress.js库支持多种解压格式 -->
-    <script src="https://cdn.jsdelivr.net/npm/uncompress.js@1.1.0/dist/uncompress.min.js"></script>
+    <!-- Pako库用于GZIP解压 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <!-- node-stream-zip库支持RAR和7Z -->
+    <script src="https://cdn.jsdelivr.net/npm/node-stream-zip@1.15.0/dist/node-stream-zip.min.js"></script>
+    <!-- 7zip-min库支持7Z格式 -->
+    <script src="https://cdn.jsdelivr.net/npm/7zip-min@1.4.4/lib/7zip-min.js"></script>
+	<!-- 支持暗道的统计代码 -->
+	<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+	<script>LA.init({id:"KtYXyLyHpzTmmxxZ",ck:"KtYXyLyHpzTmmxxZ",autoTrack:true,hashMode:true,screenRecord:true})</script>
 </head>
 <body>
     <div class="container">
@@ -29,21 +38,42 @@
         </header>
 
         <main>
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <button class="tool-btn active" id="compress-btn">
+                    <i class="fas fa-file-archive"></i>
+                    <span>压缩文件</span>
+                </button>
+                <button class="tool-btn" id="extract-btn">
+                    <i class="fas fa-folder-open"></i>
+                    <span>解压文件</span>
+                </button>
+            </div>
+
             <section class="upload-section" id="upload-section">
                 <div class="upload-container" id="drop-area">
-                    <div class="upload-icon">
-                        <i class="fas fa-file-archive"></i>
+                    <div class="upload-icon" id="upload-icon">
+                        <i class="fas fa-folder-open" id="extract-icon" style="display: none; font-size: 64px; color: #007AFF;"></i>
+                        <i class="fas fa-file-archive" id="compress-icon" style="font-size: 64px; color: #007AFF;"></i>
                     </div>
-                    <h2>上传压缩文件</h2>
-                    <p>点击或拖拽文件到此处上传<br>(支持ZIP, RAR, 7Z等格式，最大100MB)</p>
-                    <input type="file" id="file-input" accept=".zip,.rar,.7z,.tar,.gz,.bz2" hidden>
-                    <button class="upload-btn" id="upload-btn">选择文件</button>
+                    <h2 id="upload-title">选择文件进行压缩</h2>
+                    <p id="upload-description">拖拽文件到此处上传<br>(支持多种文件格式，最大100MB)</p>
+                    <input type="file" id="file-input" accept=".zip,.tar,.gz,.rar,.7z,.bz2" hidden>
+                    <input type="file" id="compress-file-input" multiple webkitdirectory hidden>
+                    <input type="file" id="compress-files-input" multiple hidden>
+                    <div class="upload-buttons" id="upload-buttons" style="display: none;">
+                        <button class="upload-btn" id="upload-btn">选择文件</button>
+                    </div>
+                    <div class="compress-buttons" id="compress-buttons">
+                        <button class="upload-btn" id="select-files-btn">选择文件</button>
+                        <button class="upload-btn secondary" id="select-folder-btn">选择文件夹</button>
+                    </div>
                 </div>
             </section>
 
             <section class="processing-section" id="processing-section">
                 <div class="progress-container">
-                    <h2>正在解压中...</h2>
+                    <h2 id="processing-text">正在压缩中...</h2>
                     <div class="progress-bar-container">
                         <div class="progress-bar" id="progress-bar"></div>
                     </div>
