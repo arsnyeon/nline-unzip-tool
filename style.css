@@ -425,6 +425,47 @@ main {
     margin-top: 8px;
 }
 
+/* 友情链接样式 */
+.friend-links {
+    margin-top: 30px;
+}
+
+.friend-links-container {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.friend-links-container h3 {
+    font-weight: normal;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--dark-gray);
+    display: inline;
+    margin-right: 10px;
+}
+
+.friend-links-list {
+    display: inline;
+}
+
+.friend-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 14px;
+    padding: 0 5px;
+    transition: all 0.2s ease;
+}
+
+.friend-link:hover {
+    color: #0066CC;
+    text-decoration: underline;
+}
+
+.link-divider {
+    color: var(--medium-gray);
+    font-size: 14px;
+}
+
 /* 页脚样式 */
 footer {
     margin-top: 40px;
@@ -461,4 +502,24 @@ footer {
         grid-template-columns: 2fr 1fr 1fr;
         padding: 12px 16px;
     }
-} 
+    
+    .friend-links-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .friend-links-container h3 {
+        margin-right: 0;
+        margin-bottom: 5px;
+        display: block;
+    }
+    
+    .friend-links-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+}
