@@ -140,6 +140,21 @@ main {
     animation: float 3s ease-in-out infinite;
 }
 
+#extract-icon {
+    display: none;
+    font-size: 64px;
+    color: #007AFF;
+}
+
+#compress-icon {
+    font-size: 64px;
+    color: #007AFF;
+}
+
+#upload-buttons {
+    display: none;
+}
+
 /* 浮动动画 */
 @keyframes float {
     0%, 100% {
@@ -439,7 +454,7 @@ main {
     font-weight: normal;
     font-size: 14px;
     margin-bottom: 8px;
-    color: var(--dark-gray);
+    color: #666666;
     display: inline;
     margin-right: 10px;
 }
@@ -449,20 +464,21 @@ main {
 }
 
 .friend-link {
-    color: var(--primary-color);
+    color: #888888;
     text-decoration: none;
     font-size: 14px;
     padding: 0 5px;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .friend-link:hover {
-    color: #0066CC;
-    text-decoration: underline;
+    color: #555555;
+    text-decoration: none;
+    transform: translateY(-1px);
 }
 
 .link-divider {
-    color: var(--medium-gray);
+    color: #CCCCCC;
     font-size: 14px;
 }
 
@@ -470,7 +486,7 @@ main {
 footer {
     margin-top: 40px;
     text-align: center;
-    color: var(--dark-gray);
+    color: #777777;
     font-size: 14px;
     padding: 20px 0;
 }
