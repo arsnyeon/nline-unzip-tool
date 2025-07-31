@@ -14,7 +14,7 @@
  * 实现功能：
  * 1. 文件上传（支持拖拽和点击上传）
  * 2. 文件大小验证（限制500MB）
- * 3. 解压ZIP格式文件
+ * 3. 解压ZIP、RAR、TAR格式文件
  * 4. 压缩文件和文件夹为ZIP格式
  * 5. 解压进度显示
  * 6. 文件浏览和下载功能
@@ -231,14 +231,14 @@ function switchMode(mode) {
             fileInput.accept = '';
         } else {
             uploadTitle.textContent = '选择压缩文件进行解压';
-            uploadDescription.innerHTML = '拖拽ZIP压缩文件到此处上传<br>(仅支持ZIP格式，最大500MB)';
+            uploadDescription.innerHTML = '拖拽压缩文件到此处上传<br>(支持ZIP、RAR、TAR格式，最大500MB)';
             uploadButtons.style.display = 'flex';
             compressButtons.style.display = 'none';
             extractIcon.style.display = 'block';
             compressIcon.style.display = 'none';
             
-            // 设置文件输入接受类型为ZIP
-            fileInput.accept = '.zip';
+            // 设置文件输入接受类型为ZIP、RAR、TAR
+            fileInput.accept = '.zip,.rar,.tar';
         }
     }
     
@@ -421,11 +421,12 @@ function handleFiles(files) {
         return;
     }
     
-    // 验证文件类型 - 只支持ZIP格式
+    // 验证文件类型 - 支持ZIP、RAR、TAR格式
     const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+    const supportedFormats = ['.zip', '.rar', '.tar'];
     
-    if (fileExt !== '.zip') {
-        showError('只支持ZIP格式的压缩文件');
+    if (!supportedFormats.includes(fileExt)) {
+        showError('只支持ZIP、RAR、TAR格式的压缩文件');
         return;
     }
     
@@ -459,8 +460,19 @@ async function extractArchive(file) {
     try {
         extractedFiles = {}; // 重置已提取文件
         
-        // 只处理ZIP文件
-        await extractZip(file);
+        // 获取文件扩展名
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        
+        // 根据文件类型选择解压方法
+        if (fileExtension === 'zip') {
+            await extractZip(file);
+        } else if (fileExtension === 'rar') {
+            await extractWithUncompress(file);
+        } else if (fileExtension === 'tar') {
+            await extractWithUncompress(file);
+        } else {
+            throw new Error('不支持的文件格式');
+        }
         
         // 更新结果标题为解压结果
         const resultHeader = document.querySelector('.result-header h2');
@@ -527,6 +539,176 @@ async function extractZip(file) {
         console.error('ZIP解压失败:', error);
         throw new Error('ZIP解压失败');
     }
+}
+
+/**
+ * 使用uncompress.js解压RAR和TAR文件
+ * @param {File} file - 要解压的文件
+ */
+async function extractWithUncompress(file) {
+    return new Promise((resolve, reject) => {
+        // 设置超时处理
+        const timeoutId = setTimeout(() => {
+            reject(new Error('解压超时，请重试'));
+        }, 30000); // 30秒超时
+        
+        // 获取文件扩展名来确定格式
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        const supportedFormats = [];
+        
+        if (fileExtension === 'rar') {
+            supportedFormats.push('rar');
+        } else if (fileExtension === 'tar') {
+            supportedFormats.push('tar');
+        }
+        
+        // 处理文件的核心逻辑
+        const processFile = () => {
+            try {
+                // 打开压缩文件
+                archiveOpenFile(file, null, (archive, error) => {
+                    clearTimeout(timeoutId);
+                    
+                    if (error) {
+                        reject(new Error(`无法打开${fileExtension.toUpperCase()}文件: ${error.message}`));
+                        return;
+                    }
+                    
+                    if (!archive || !archive.entries) {
+                        reject(new Error(`${fileExtension.toUpperCase()}文件格式错误或已损坏`));
+                        return;
+                    }
+                    
+                    try {
+                        const totalFiles = archive.entries.length;
+                        let processedFiles = 0;
+                        let completedFiles = 0;
+                        
+                        // 如果没有文件，直接完成
+                        if (totalFiles === 0) {
+                            if (archive && typeof archiveClose === 'function') {
+                                archiveClose(archive);
+                            }
+                            resolve();
+                            return;
+                        }
+                        
+                        // 处理每个文件
+                        archive.entries.forEach((entry, index) => {
+                            // 跳过目录
+                            if (!entry.is_file) {
+                                processedFiles++;
+                                updateProgress(Math.floor((processedFiles / totalFiles) * 100));
+                                
+                                completedFiles++;
+                                if (completedFiles === totalFiles) {
+                                    if (archive && typeof archiveClose === 'function') {
+                                        archiveClose(archive);
+                                    }
+                                    resolve();
+                                }
+                                return;
+                            }
+                            
+                            // 读取文件数据
+                            try {
+                                entry.readData((data, error) => {
+                                    if (error) {
+                                        console.error(`读取文件 ${entry.name} 失败:`, error);
+                                    } else if (data) {
+                                        // 创建Blob对象
+                                        const blob = new Blob([data], { type: getMimeType(entry.name) });
+                                        
+                                        // 存储提取的文件
+                                        extractedFiles[entry.name] = {
+                                            name: entry.name.split('/').pop(),
+                                            path: entry.name,
+                                            size: blob.size,
+                                            type: blob.type,
+                                            content: blob
+                                        };
+                                    }
+                                    
+                                    // 更新进度
+                                    processedFiles++;
+                                    updateProgress(Math.floor((processedFiles / totalFiles) * 100));
+                                    
+                                    // 检查是否所有文件都已处理完成
+                                    completedFiles++;
+                                    if (completedFiles === totalFiles) {
+                                        if (archive && typeof archiveClose === 'function') {
+                                            archiveClose(archive);
+                                        }
+                                        resolve();
+                                    }
+                                });
+                            } catch (readError) {
+                                console.error(`处理文件 ${entry.name} 时出错:`, readError);
+                                completedFiles++;
+                                if (completedFiles === totalFiles) {
+                                    if (archive && typeof archiveClose === 'function') {
+                                        archiveClose(archive);
+                                    }
+                                    resolve();
+                                }
+                            }
+                        });
+                        
+                    } catch (error) {
+                        if (archive && typeof archiveClose === 'function') {
+                            archiveClose(archive);
+                        }
+                        reject(new Error(`解压${fileExtension.toUpperCase()}文件失败: ${error.message}`));
+                    }
+                });
+            } catch (error) {
+                clearTimeout(timeoutId);
+                reject(new Error(`处理${fileExtension.toUpperCase()}文件时出错: ${error.message}`));
+            }
+        };
+        
+        // 使用原始的loadArchiveFormats，但修复其回调问题
+        try {
+            // 保存原始的loadArchiveFormats函数
+            const originalLoadArchiveFormats = window.loadArchiveFormats;
+            
+            // 创建一个包装函数来修复回调问题
+            const wrappedLoadArchiveFormats = (formats, callback) => {
+                // 检查格式是否已经加载
+                const isFormatLoaded = (format) => {
+                    switch(format) {
+                        case 'rar':
+                            return typeof readRARFileNames !== 'undefined';
+                        case 'tar':
+                            return typeof tarGetEntries !== 'undefined';
+                        default:
+                            return false;
+                    }
+                };
+                
+                // 检查所有格式是否都已加载
+                const allFormatsLoaded = formats.every(format => isFormatLoaded(format));
+                
+                if (allFormatsLoaded) {
+                    // 如果都已加载，直接调用回调
+                    setTimeout(callback, 0);
+                } else {
+                    // 否则调用原始函数
+                    originalLoadArchiveFormats(formats, callback);
+                }
+            };
+            
+            // 使用包装后的函数
+            wrappedLoadArchiveFormats(supportedFormats, () => {
+                setTimeout(() => {
+                    processFile();
+                }, 100);
+            });
+        } catch (loadError) {
+            clearTimeout(timeoutId);
+            reject(new Error(`加载${fileExtension.toUpperCase()}解压库失败: ${loadError.message}`));
+        }
+    });
 }
 
 /**
