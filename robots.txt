@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+
+# 网站地图
+Sitemap: https://yasuo.zip/sitemap.xml
+
+# 主要页面
+Allow: /index.html
+Allow: /css/
+Allow: /js/
+
+# 禁止访问的目录（如果有的话）
+# Disallow: /private/
+
+# 爬虫延迟（可选）
+Crawl-delay: 1
+
+# 针对特定搜索引擎的设置
+User-agent: Googlebot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: bingbot
+Allow: /
