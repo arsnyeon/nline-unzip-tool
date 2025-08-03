@@ -90,29 +90,37 @@ const elements = {
     errorClose: document.getElementById('error-close'),
     compressBtn: document.getElementById('compress-btn'),
     extractBtn: document.getElementById('extract-btn'),
+    imageCompressBtn: document.getElementById('image-compress-btn'),
     compressFileInput: document.getElementById('compress-file-input'),
     compressFilesInput: document.getElementById('compress-files-input'),
+    imageCompressInput: document.getElementById('image-compress-input'),
     selectFilesBtn: document.getElementById('select-files-btn'),
     selectFolderBtn: document.getElementById('select-folder-btn'),
+    selectImagesBtn: document.getElementById('select-images-btn'),
     uploadTitle: document.getElementById('upload-title'),
     uploadDescription: document.getElementById('upload-description'),
     uploadButtons: document.getElementById('upload-buttons'),
     compressButtons: document.getElementById('compress-buttons'),
+    imageCompressButtons: document.getElementById('image-compress-buttons'),
     extractIcon: document.getElementById('extract-icon'),
-    compressIcon: document.getElementById('compress-icon')
+    compressIcon: document.getElementById('compress-icon'),
+    imageCompressIcon: document.getElementById('image-compress-icon'),
+    qualitySlider: document.getElementById('quality-slider'),
+    qualityValue: document.getElementById('quality-value')
 };
 
 // 存储解压后的文件或待压缩的文件
 let extractedFiles = {};
 let currentFile = null;
-let currentMode = 'compress'; // 当前模式：'extract' 或 'compress'
+let currentMode = 'compress'; // 当前模式：'extract'、'compress' 或 'image-compress'
 
 /**
  * 初始化事件监听器
  */
 function initEventListeners() {
-    const { dropArea, fileInput, uploadBtn, downloadAllBtn, errorClose, compressBtn, extractBtn, 
-            selectFilesBtn, selectFolderBtn, compressFilesInput, compressFileInput } = elements;
+    const { dropArea, fileInput, uploadBtn, downloadAllBtn, errorClose, compressBtn, extractBtn, imageCompressBtn,
+            selectFilesBtn, selectFolderBtn, selectImagesBtn, compressFilesInput, compressFileInput, 
+            imageCompressInput, qualitySlider, qualityValue } = elements;
 
     // 上传按钮点击事件
     uploadBtn.addEventListener('click', () => currentMode === 'extract' && fileInput.click());
@@ -127,8 +135,11 @@ function initEventListeners() {
 
     // 点击拖放区域触发文件选择
     dropArea.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'BUTTON' && !e.target.closest('button') && currentMode === 'extract') {
-            fileInput.click();
+        if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
+            if (currentMode === 'extract') {
+                fileInput.click();
+            }
+            // 删除了图片压缩模式的点击事件，只保留拖拽功能
         }
     });
 
@@ -137,10 +148,18 @@ function initEventListeners() {
     errorClose.addEventListener('click', () => elements.errorPopup.style.display = 'none');
     compressBtn?.addEventListener('click', () => switchMode('compress'));
     extractBtn?.addEventListener('click', () => switchMode('extract'));
+    imageCompressBtn?.addEventListener('click', () => switchMode('image-compress'));
     selectFilesBtn?.addEventListener('click', () => compressFilesInput.click());
     selectFolderBtn?.addEventListener('click', () => compressFileInput.click());
+    selectImagesBtn?.addEventListener('click', () => imageCompressInput.click());
     compressFilesInput?.addEventListener('change', handleCompressFilesSelect);
     compressFileInput?.addEventListener('change', handleCompressFolderSelect);
+    imageCompressInput?.addEventListener('change', handleImageCompressSelect);
+    
+    // 质量滑块事件
+    qualitySlider?.addEventListener('input', (e) => {
+        qualityValue.textContent = e.target.value;
+    });
 }
 
 /**
@@ -160,23 +179,30 @@ function handleDragEvent(e) {
         dropArea.classList.remove('drag-over');
         const files = e.dataTransfer.files;
         if (files.length) {
-            currentMode === 'extract' ? handleFiles(files) : handleCompressFiles(files);
+            if (currentMode === 'extract') {
+                handleFiles(files);
+            } else if (currentMode === 'compress') {
+                handleCompressFiles(files);
+            } else if (currentMode === 'image-compress') {
+                handleImageCompressFiles(files);
+            }
         }
     }
 }
 
 /**
  * 切换工具模式
- * @param {string} mode - 模式：'compress' 或 'extract'
+ * @param {string} mode - 模式：'compress'、'extract' 或 'image-compress'
  */
 function switchMode(mode) {
     currentMode = mode;
-    const { compressBtn, extractBtn, uploadTitle, uploadDescription, uploadButtons, 
-            compressButtons, extractIcon, compressIcon, fileInput } = elements;
+    const { compressBtn, extractBtn, imageCompressBtn, uploadTitle, uploadDescription, uploadButtons, 
+            compressButtons, imageCompressButtons, extractIcon, compressIcon, imageCompressIcon, fileInput } = elements;
     
     // 更新按钮状态
     compressBtn?.classList.toggle('active', mode === 'compress');
     extractBtn?.classList.toggle('active', mode === 'extract');
+    imageCompressBtn?.classList.toggle('active', mode === 'image-compress');
     
     // 更新界面显示
     if (mode === 'compress') {
@@ -184,17 +210,31 @@ function switchMode(mode) {
         uploadDescription.innerHTML = '拖拽文件到此处上传<br>(支持多种文件格式，最大500MB)';
         uploadButtons.style.display = 'none';
         compressButtons.style.display = 'flex';
+        imageCompressButtons.style.display = 'none';
         extractIcon.style.display = 'none';
         compressIcon.style.display = 'block';
+        imageCompressIcon.style.display = 'none';
         fileInput.accept = '';
-    } else {
+    } else if (mode === 'extract') {
         uploadTitle.textContent = '选择压缩文件进行解压';
         uploadDescription.innerHTML = '拖拽压缩文件到此处上传<br>(支持ZIP、GZ、TAR格式，最大500MB)';
         uploadButtons.style.display = 'flex';
         compressButtons.style.display = 'none';
+        imageCompressButtons.style.display = 'none';
         extractIcon.style.display = 'block';
         compressIcon.style.display = 'none';
+        imageCompressIcon.style.display = 'none';
         fileInput.accept = '.zip,.gz,.tar';
+    } else if (mode === 'image-compress') {
+        uploadTitle.textContent = '选择图片进行压缩';
+        uploadDescription.innerHTML = '拖拽图片到此处上传<br>(支持JPG、PNG、WebP格式，最大500MB)';
+        uploadButtons.style.display = 'none';
+        compressButtons.style.display = 'none';
+        imageCompressButtons.style.display = 'flex';
+        extractIcon.style.display = 'none';
+        compressIcon.style.display = 'none';
+        imageCompressIcon.style.display = 'block';
+        fileInput.accept = '';
     }
     
     resetInterface();
@@ -218,6 +258,150 @@ function handleCompressFolderSelect(e) {
     if (files.length) {
         handleCompressFiles(files);
     }
+}
+
+/**
+ * 处理图片压缩文件选择
+ */
+function handleImageCompressSelect(e) {
+    const files = e.target.files;
+    if (files.length) {
+        handleImageCompressFiles(files);
+    }
+}
+
+/**
+ * 处理要压缩的图片文件
+ * @param {FileList} files - 要压缩的图片文件列表
+ */
+function handleImageCompressFiles(files) {
+    // 验证文件类型和大小
+    const validFiles = [];
+    const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        if (!supportedTypes.includes(file.type)) {
+            showError(`文件 ${file.name} 不是支持的图片格式\n支持的格式：JPG、PNG、WebP`);
+            return;
+        }
+        
+        if (file.size > MAX_FILE_SIZE) {
+            showError(`文件 ${file.name} 大小超过限制（${formatFileSize(MAX_FILE_SIZE)}）`);
+            return;
+        }
+        
+        validFiles.push(file);
+    }
+    
+    if (validFiles.length === 0) {
+        showError('没有找到有效的图片文件');
+        return;
+    }
+    
+    showProcessingUI('正在压缩图片...');
+    compressImages(validFiles);
+}
+
+/**
+ * 压缩图片文件
+ * @param {Array} files - 要压缩的图片文件数组
+ */
+async function compressImages(files) {
+    try {
+        const quality = parseInt(elements.qualitySlider.value) / 100;
+        const totalFiles = files.length;
+        let processedFiles = 0;
+        extractedFiles = {};
+        
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            
+            // 压缩图片
+            const compressedBlob = await compressImage(file, quality);
+            
+            // 生成压缩后的文件名
+            const originalName = file.name;
+            const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.'));
+            const ext = originalName.substring(originalName.lastIndexOf('.'));
+            const compressedName = `${nameWithoutExt}(yasuo.zip)${ext}`;
+            
+            // 存储压缩后的文件
+            extractedFiles[compressedName] = {
+                name: compressedName,
+                path: compressedName,
+                size: compressedBlob.size,
+                type: compressedBlob.type,
+                content: compressedBlob,
+                originalSize: file.size,
+                compressionRatio: ((file.size - compressedBlob.size) / file.size * 100).toFixed(1)
+            };
+            
+            // 更新进度
+            processedFiles++;
+            updateProgress(Math.floor((processedFiles / totalFiles) * 100));
+        }
+        
+        // 计算总体压缩信息
+        const totalOriginalSize = files.reduce((sum, file) => sum + file.size, 0);
+        const totalCompressedSize = Object.values(extractedFiles).reduce((sum, file) => sum + file.size, 0);
+        const overallCompressionRatio = ((totalOriginalSize - totalCompressedSize) / totalOriginalSize * 100).toFixed(1);
+        
+        // 更新文件信息
+        elements.fileName.textContent = `${files.length}个图片文件 (压缩率: ${overallCompressionRatio}%)`;
+        elements.fileSize.textContent = `${formatFileSize(totalCompressedSize)} (原始: ${formatFileSize(totalOriginalSize)})`;
+        
+        showResults('图片压缩结果');
+        
+    } catch (error) {
+        console.error('图片压缩失败:', error);
+        showError('图片压缩失败: ' + error.message);
+        resetInterface();
+    }
+}
+
+/**
+ * 压缩单个图片
+ * @param {File} file - 要压缩的图片文件
+ * @param {number} quality - 压缩质量 (0-1)
+ * @returns {Promise<Blob>} 压缩后的图片Blob
+ */
+function compressImage(file, quality) {
+    return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = function() {
+            // 设置画布尺寸
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            // 绘制图片到画布
+            ctx.drawImage(img, 0, 0);
+            
+            // 根据原始格式选择输出格式
+            let outputFormat = 'image/jpeg';
+            if (file.type === 'image/png') {
+                outputFormat = 'image/png';
+            } else if (file.type === 'image/webp') {
+                outputFormat = 'image/webp';
+            }
+            
+            // 转换为Blob
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error('图片压缩失败'));
+                }
+            }, outputFormat, quality);
+        };
+        
+        img.onerror = () => reject(new Error('图片加载失败'));
+        img.src = URL.createObjectURL(file);
+    });
 }
 
 /**
@@ -659,12 +843,18 @@ function createFileItem(file) {
     
     const fileIcon = getFileIcon(file.name);
     
+    // 如果是图片压缩结果，显示压缩信息
+    let sizeDisplay = formatFileSize(file.size);
+    if (file.originalSize && file.compressionRatio) {
+        sizeDisplay = `${formatFileSize(file.size)} <small style="color: var(--secondary-color);">(-${file.compressionRatio}%)</small>`;
+    }
+    
     fileItem.innerHTML = `
         <div class="file-name">
             <i class="${fileIcon}"></i>
             <span title="${file.path}">${file.path}</span>
         </div>
-        <div class="file-size">${formatFileSize(file.size)}</div>
+        <div class="file-size">${sizeDisplay}</div>
         <div class="file-action">
             <button onclick="downloadFile(extractedFiles['${file.path}'])">
                 <i class="fas fa-download"></i> 下载
@@ -823,13 +1013,14 @@ function showError(message) {
  * 重置界面到初始状态
  */
 function resetInterface() {
-    const { uploadSection, processingSection, resultSection, fileInput, compressFilesInput, compressFileInput } = elements;
+    const { uploadSection, processingSection, resultSection, fileInput, compressFilesInput, compressFileInput, imageCompressInput } = elements;
     uploadSection.style.display = 'block';
     processingSection.style.display = 'none';
     resultSection.style.display = 'none';
     fileInput.value = '';
     compressFilesInput && (compressFilesInput.value = '');
     compressFileInput && (compressFileInput.value = '');
+    imageCompressInput && (imageCompressInput.value = '');
 }
 
 /**

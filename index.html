@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>在线解压缩工具 - 免费ZIP/GZ/TAR压缩包解压 | yasuo.zip</title>
-    <meta name="description" content="免费在线压缩包解压工具，支持ZIP、GZ、TAR格式解压和文件压缩。无需安装软件，纯浏览器操作，文件本地处理保证安全。支持批量解压、文件预览、单独下载，是办公学习的必备工具。" />
-    <meta name="keywords" content="在线解压,ZIP解压,压缩包解压,文件压缩,在线压缩,GZ解压,TAR解压,免费解压工具,在线工具,文件处理" />
+    <title>在线解压缩工具 - 免费ZIP/GZ/TAR解压+图片压缩 | yasuo.zip</title>
+    <meta name="description" content="免费在线压缩包解压工具，支持ZIP、GZ、TAR格式解压、文件压缩和图片压缩。无需安装软件，纯浏览器操作，文件本地处理保证安全。支持批量解压、图片压缩、文件预览、单独下载，是办公学习的必备工具。" />
+    <meta name="keywords" content="在线解压,ZIP解压,压缩包解压,文件压缩,在线压缩,图片压缩,GZ解压,TAR解压,免费解压工具,在线工具,文件处理,图片优化" />
     <meta name="author" content="ArsnYeon" />
     <meta name="robots" content="index, follow" />
     <meta name="googlebot" content="index, follow" />
@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js" crossorigin="anonymous"></script>
-	<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+	<script charset="UTF-8" id="LA_COLLECT" src="https://sdk.51.la/js-sdk-pro.min.js"></script>
 	<script>LA.init({id:"KtYXyLyHpzTmmxxZ",ck:"KtYXyLyHpzTmmxxZ",autoTrack:true,hashMode:true,screenRecord:true})</script>
 </head>
 <body>
@@ -53,26 +53,33 @@
                     <path d="M16 16 L20 20 L16 24" stroke="#007AFF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M32 16 L28 20 L32 24" stroke="#007AFF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <h1>免费在线解压缩工具 - 支持ZIP/GZ/TAR格式</h1>
+                <h1>免费在线解压缩工具</h1>
             </div>
         </header>
 
         <main role="main">
             <div style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;">
                 <h2>在线解压缩工具功能介绍</h2>
-                <p>本工具是一款专业的在线压缩包解压工具，支持ZIP解压、GZ解压、TAR解压等多种格式。用户可以直接在浏览器中解压压缩包，无需下载安装任何软件。同时支持文件压缩功能，可以将多个文件或文件夹压缩成ZIP格式。所有文件处理都在本地完成，确保文件安全和隐私保护。</p>
+                <p>本工具是一款专业的在线压缩包解压工具，支持ZIP解压、GZ解压、TAR解压等多种格式。用户可以直接在浏览器中解压压缩包，无需下载安装任何软件。同时支持文件压缩功能，可以将多个文件或文件夹压缩成ZIP格式。此外，还提供专业的图片压缩功能，支持JPG、PNG、WebP等格式的图片优化压缩。所有文件处理都在本地完成，确保文件安全和隐私保护。</p>
                 <h3>支持的压缩格式</h3>
                 <ul>
                     <li>ZIP格式解压 - 最常用的压缩格式，完全兼容</li>
                     <li>GZ格式解压 - Gzip压缩格式，支持单文件解压</li>
                     <li>TAR格式解压 - Unix/Linux归档格式</li>
                 </ul>
+                <h3>图片压缩功能</h3>
+                <ul>
+                    <li>支持JPG、PNG、WebP格式图片压缩</li>
+                    <li>可调节压缩质量，平衡文件大小与图片质量</li>
+                    <li>批量图片压缩，提高工作效率</li>
+                    <li>保持原始图片格式，无需格式转换</li>
+                </ul>
                 <h3>主要特性</h3>
                 <ul>
                     <li>免费使用，无需注册</li>
                     <li>支持拖拽上传</li>
                     <li>文件本地处理，保护隐私</li>
-                    <li>支持批量解压和压缩</li>
+                    <li>支持批量解压、压缩和图片优化</li>
                     <li>响应式设计，支持移动设备</li>
                 </ul>
             </div>
@@ -85,6 +92,10 @@
                     <i class="fas fa-folder-open" aria-hidden="true"></i>
                     <span>解压文件</span>
                 </button>
+                <button class="tool-btn" id="image-compress-btn" aria-pressed="false" aria-describedby="image-compress-desc">
+                    <i class="fas fa-image" aria-hidden="true"></i>
+                    <span>图片压缩</span>
+                </button>
             </nav>
             <div style="position: absolute; left: -9999px;">
                 <div id="compress-desc">将多个文件或文件夹压缩成ZIP格式</div>
@@ -96,18 +107,27 @@
                     <div class="upload-icon" id="upload-icon" aria-hidden="true">
                         <i class="fas fa-folder-open" id="extract-icon"></i>
                         <i class="fas fa-file-archive" id="compress-icon"></i>
+                        <i class="fas fa-image" id="image-compress-icon"></i>
                     </div>
                     <h2 id="upload-title">选择文件进行压缩</h2>
                     <p id="upload-description">拖拽文件到此处上传<br>(支持多种文件格式，最大500MB)</p>
                     <input type="file" id="file-input" accept=".zip,.gz,.tar" hidden aria-label="选择压缩文件">
                     <input type="file" id="compress-file-input" multiple webkitdirectory hidden aria-label="选择文件夹">
                     <input type="file" id="compress-files-input" multiple hidden aria-label="选择多个文件">
+                    <input type="file" id="image-compress-input" multiple accept="image/*" hidden aria-label="选择要压缩的图片">
                     <div class="upload-buttons" id="upload-buttons">
                         <button class="upload-btn" id="upload-btn" aria-describedby="upload-description">选择文件</button>
                     </div>
                     <div class="compress-buttons" id="compress-buttons">
                         <button class="upload-btn" id="select-files-btn" aria-label="选择要压缩的文件">选择文件</button>
                         <button class="upload-btn secondary" id="select-folder-btn" aria-label="选择要压缩的文件夹">选择文件夹</button>
+                    </div>
+                    <div class="image-compress-buttons" id="image-compress-buttons">
+                        <button class="upload-btn" id="select-images-btn" aria-label="选择要压缩的图片">选择图片</button>
+                        <div class="compress-options">
+                            <label for="quality-slider">压缩质量: <span id="quality-value">30</span>%</label>
+                            <input type="range" id="quality-slider" min="10" max="100" value="30" class="quality-slider">
+                        </div>
                     </div>
                 </div>
             </section>
@@ -168,14 +188,14 @@
         </aside>
 
         <footer role="contentinfo">
-            <p>© <script>document.write(new Date().getFullYear());</script> 在线解压缩工具 yasuo.zip | 所有文件处理均在本地完成，确保您的文件安全</p>
             <p>
                 <small>
-                    关键词：在线解压、ZIP解压、压缩包解压、文件压缩、在线工具、免费解压工具
+                    关键词：在线解压、ZIP解压、压缩包解压、文件压缩、图片压缩、在线工具、免费解压工具、图片优化
                     <br>
-                    本站提供专业的在线压缩包解压服务，支持ZIP、GZ、TAR等主流格式，是您处理压缩文件的最佳选择。
+                    本站提供专业的在线压缩包解压和图片压缩服务，支持ZIP、GZ、TAR等主流格式解压，以及JPEG、PNG、WebP图片压缩优化，是您处理压缩文件和图片优化的最佳选择。
                 </small>
             </p>
+            <p>© <script>document.write(new Date().getFullYear());</script> 在线解压缩工具 yasuo.zip | 所有文件处理均在本地完成，确保您的文件安全</p>
         </footer>
     </div>
 
