@@ -539,13 +539,18 @@ async function extractTar(file) {
             }
             if (isEnd) break;
             
-            // 读取文件名（前100字节）
-            let fileName = '';
+            // 读取文件名（前100字节）- 使用智能编码检测
+            const fileNameBytes = new Uint8Array(100);
+            let fileNameLength = 0;
             for (let i = 0; i < 100; i++) {
                 const byte = view.getUint8(offset + i);
                 if (byte === 0) break;
-                fileName += String.fromCharCode(byte);
+                fileNameBytes[i] = byte;
+                fileNameLength++;
             }
+            
+            // 使用智能编码检测解码文件名
+            const fileName = smartDecodeFileName(fileNameBytes.slice(0, fileNameLength));
             
             if (!fileName) break;
             
